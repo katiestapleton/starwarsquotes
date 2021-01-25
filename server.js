@@ -6,16 +6,12 @@ const app = express();
 const connectionString = 'mongodb+srv://meepmeep:ESgw1aiyVNPUUrJr@starwars.hfrvd.mongodb.net/starWarsQuotes?retryWrites=true&w=majority'
 
 
-	
-	// Make sure you place body-parser before your CRUD handlers!
+// Make sure you place body-parser before your CRUD handlers!
 app.use(bodyParser.urlencoded({ extended: true }))
 	
 	// All your handlers here...
-app.get('/', (req, res) => {/*...*/})
-app.post('/quotes', (req, res) => {/*...*/})
--------------------------------------
-
-
+//app.get('/', (req, res) => {/*...*/})
+//app.post('/quotes', (req, res) => {/*...*/})
 
 
 // Use JS Promise to connect to MongoDB
@@ -24,6 +20,43 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
     console.log('Connected to Database')
     const db = client.db('starWarsQuotes')
     const quotesCollection = db.collection('quotes')
+    
+    app.post('/quotes', (req, res) => {
+        quotesCollection.insertOne(req.body)
+          .then(result => {
+            res.redirect('/')
+          })
+          .catch(error => console.error(error))
+      })
+    
+    app.set('view engine', 'ejs')
+    /*  app.get('/', (req, res) => {
+        const cursor = db.collection('quotes').find()
+        console.log(cursor)
+        // ...
+      })
+    
+   
+    app.get('/', (req, res) => {
+        db.collection('quotes').find().toArray()
+          .then(results => {
+            console.log(results)
+          })
+          .catch(error => console.error(error))
+      })
+    */
+      app.get('/', (req, res) => {
+        db.collection('quotes').find().toArray()
+          .then(results => {
+            res.render('index.ejs', { quotes: results })
+          })
+          .catch(/* ... */)
+      })
+
+
+    app.post('/quotes', (req, res) => {
+        console.log('Hellooooooooooooooooo!')
+      })
 
     app.get('/', (req, res) => {
         res.sendFile(__dirname + '/index.html')
