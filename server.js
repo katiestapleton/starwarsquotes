@@ -8,7 +8,8 @@ const connectionString = 'mongodb+srv://meepmeep:ESgw1aiyVNPUUrJr@starwars.hfrvd
 
 // Make sure you place body-parser before your CRUD handlers!
 app.use(bodyParser.urlencoded({ extended: true }))
-	
+app.use(express.static('public'))
+app.use(bodyParser.json())
 	// All your handlers here...
 //app.get('/', (req, res) => {/*...*/})
 //app.post('/quotes', (req, res) => {/*...*/})
@@ -60,6 +61,23 @@ MongoClient.connect(connectionString, { useUnifiedTopology: true })
 
     app.get('/', (req, res) => {
         res.sendFile(__dirname + '/index.html')
+    })
+
+    app.put('/quotes', (req, res) => {
+      quotesCollection.findOneAndUpdate(
+        { name: 'Yoda' },
+        {
+          $set: {
+            name: req.body.name,
+            quote: req.body.quote
+          }
+        },
+        {
+          upsert: true
+        }
+      )
+        .then(result => res.json('Success'))
+        .catch(error => console.error(error))
     })
 
     app.listen(3000, function() {
